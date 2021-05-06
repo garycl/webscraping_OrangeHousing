@@ -1,0 +1,4 @@
+*.py
+.idea/
+venv/
+!items.py
