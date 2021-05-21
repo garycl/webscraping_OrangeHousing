@@ -8,8 +8,8 @@ class RedfinSpider(Spider):
     allowed_urls = ['https://www.redfin.com/']
 
     def start_requests(self):
-        redfin_url = 'https://www.redfin.com/zipcode/{}/filter/property-type=house+condo+townhouse,include=sold-6mo'
-        csv = '/Users/Gary/Dropbox/Projects/redfin/redfin/spiders/orange_county_zips.csv'
+        redfin_url = 'https://www.redfin.com/zipcode/{}/filter/property-type=house,include=sold-1yr'
+        csv = '/Users/Gary/Dropbox/Projects/redfin/redfin/spiders/irvine_zips.csv'
         df = pd.read_csv(csv, names=['zip'])
         zip_urls = [redfin_url.format(x) for x in df['zip']]
 
@@ -45,9 +45,15 @@ class RedfinSpider(Spider):
         baths = response.xpath('//div[@class="stat-block baths-section"]//text()').extract()
         sqft = response.xpath('//div[@class="stat-block sqft-section"]//text()').extract()
 
+        # Last sold date
+        sale_date = response.xpath('//div[@id="propertyHistory-0"]/div[@class="col-4"]//text()').extract()
+
         # Address
         address = response.xpath('//h1[@class="address"]//text()').extract()
         street, _ , zipcode = [i for i in address]
+
+        # Remarks
+        remarks = response.xpath('//div[@class="remarks"]//text()').extract()
 
         # Key details
         key_details = response.xpath('//div[@class="keyDetailsList"]//text()').extract()
@@ -125,6 +131,7 @@ class RedfinSpider(Spider):
         item['beds'] = beds
         item['baths'] = baths
         item['sqft'] = sqft
+        item['rermarks'] = remarks
         item['street'] = street
         item['zipcode'] = zipcode
         item['key_details_dict'] = key_details_dict
